@@ -120,9 +120,16 @@ krb5_error_code copy_keytab_into_memory(TALLOC_CTX *mem_ctx, krb5_context kctx,
         return kerr;
     }
 
+    kerr = access(keytab_file, R_OK);
+    if (kerr != 0) {
+        DEBUG(SSSDBG_CRIT_FAILURE, "keytab [%s] is not readable by us.\n",
+                                    keytab_file);
+        goto done;
+    }
+
     kerr = sss_krb5_kt_have_content(kctx, keytab);
     if (kerr != 0) {
-        DEBUG(SSSDBG_CRIT_FAILURE, "keytab [%s] has not entries.\n",
+        DEBUG(SSSDBG_CRIT_FAILURE, "keytab [%s] has no entries.\n",
                                     keytab_file);
         goto done;
     }
